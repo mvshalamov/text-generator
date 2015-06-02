@@ -1,0 +1,7 @@
+*.pyc
+*.log
+*.swp
+*.pid
+.idea
+.DS_Store
+.coverage
