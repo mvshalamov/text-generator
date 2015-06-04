@@ -2,13 +2,20 @@
   conditions: []
   probability: 40
   values:
-    - conditions: []
-      probavility: 10
+    - conditions: ""
+      probability: 10
       value: "sdfsdfsdfsdf sdf sdf sdf sdf sdfsd sf sd f"
 
-    - 'conditions': []
+    - conditions: "distance > 10 and distance < 20"
       'value': '<type~inflect_case:gent~lower> <name> {разместился|расположен|находится} в <distance> от центра города <city~inflect_case:gent~capfirst>'
 
     - 'conditions': [lambda h: h.distance_to_city_center() < 2500]
       'value': '<type~inflect_case:"nomn"~capfirst> <name> {разместился|расположен|находится} в историческом центре города <city~inflect_case:"nomn"~capfirst>, в окружении самых известных памятников города'
 
+- name: "NAME+LOC-AI"
+  conditions: []
+  probability: 20
+  values:
+    - conditions: []
+      probavility: 10
+      value: "sdfsdfsdfsdf sdf sdf sdf sdf sdfsd sf sd f"

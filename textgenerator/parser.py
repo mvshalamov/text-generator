@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 import textgenerator.functions
+import random
 
 PATTERN = "<[^>\n]+>"
 
@@ -96,3 +97,60 @@ def fabric_tplengine_functions(name_function):
         return None
 
     return func
+
+
+def choice_tpl_by_probability(list_tpl):
+    """
+    :param list_tpl: список шаблонов с вероятностями
+    :return: выбранный по вероятности шаблон
+    """
+    probability_list = []
+    position = 0
+    for item in list_tpl:
+        probability = item.get('probability', 1)
+        probability_list.append((position, position + probability, item))
+        position += probability
+
+    if position:
+        choice = random.randint(1, position)
+        for start_prob, end_prob, item in probability_list:
+            if start_prob < choice <= end_prob:
+                print choice, position, item
+                return item
+
+
+def parse_conditions(tpl_conditions):
+    """
+    :param tpl_conditions: distance > 10 and distance < 20
+    :return: ['distance', '>', '10', 'and', 'distance', '<', '20']
+    """
+    PATTERN_FOR_TOKENS = '>|>=|<|<=|==|or|and|\w+'
+    tokens_compile = re.compile(PATTERN_FOR_TOKENS)
+    tokens = tokens_compile.findall(tpl_conditions)
+    return tokens
+
+
+def replace_var_conditions(token_conditions, vars_data):
+    """
+    :param token_conditions: ['distance', '>', '10', 'and', 'distance', '<', '20']
+    :param vars_data: {'distance': 10}
+    :return: [10, '>', '10', 'and', 10, '<', '20']
+    """
+    tokens = token_conditions[:]
+    for i, token in enumerate(tokens):
+        if token in vars_data:
+            tokens[i] = vars_data[token]
+
+    return tokens
+
+
+def execute_conditions(conditions):
+    """
+    :param conditions: [10, '>', '10', 'and', 10, '<', '20']
+    :return: True or False conditions
+    """
+    cond = ' '.join([str(it) for it in conditions])
+    try:
+        return eval(cond)
+    except SyntaxError:
+        return False
