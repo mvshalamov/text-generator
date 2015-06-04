@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import pymorphy2
 from pymorphy2.shapes import restore_capitalization
+import random
+import re
 
 morph = pymorphy2.MorphAnalyzer()
 
@@ -28,3 +30,18 @@ def inflect_case(value, case):
 
 def lower(value):
     return value.lower()
+
+
+def spintax(value):
+    if isinstance(value, str):
+        value = value.decode('utf8')
+    delimiter = '|'
+    while True:
+        value, n = re.subn(
+            '{([^{}]*)}',
+            lambda m: random.choice(m.group(1).split(delimiter)),
+            value
+        )
+        if n == 0:
+            break
+    return value
