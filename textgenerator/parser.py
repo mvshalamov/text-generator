@@ -119,12 +119,44 @@ def choice_tpl_by_probability(list_tpl):
                 return item
 
 
+def group_tpl_by_id(list_tpl):
+    """
+    :param list_tpl: [{'probability': int, ....},{'probability': int}]
+    :return: [(start_pos, end_position, {'probability': 10,}) -
+    при вероятностях 10, 15 - получим [(0, 10, item) (10, 25, item)]
+    второй параметр, суммарное кол-во вероятностей
+    """
+    probability_list = []
+    max_num_probability = 0
+    for item in list_tpl:
+        probability = item.get('probability', 1)
+        probability_list.append((max_num_probability, max_num_probability + probability, item))
+        max_num_probability += probability
+
+    return probability_list, max_num_probability
+
+
+def choice_from_group_probability(group_probability, num_probability):
+    """
+    :param group_probability: результат group_tpl_by_id
+    :param num_probability: выпавшая вероятность от 1 до результат group_tpl_by_id[1]
+    ex: choice = random.randint(1, group_tpl_by_id[1])
+    :return: выбранный элемент
+    """
+    probability_list, max_num_probability = group_probability
+    if max_num_probability:
+        for start_prob, end_prob, item in probability_list:
+            if start_prob < num_probability <= end_prob:
+                print num_probability, num_probability, item
+                return item
+
+
 def parse_conditions(tpl_conditions):
     """
     :param tpl_conditions: distance > 10 and distance < 20
     :return: ['distance', '>', '10', 'and', 'distance', '<', '20']
     """
-    PATTERN_FOR_TOKENS = '>|>=|<|<=|==|or|and|\w+'
+    PATTERN_FOR_TOKENS = '>|>=|<|<=|==|or|and|[\w\d]+'
     tokens_compile = re.compile(PATTERN_FOR_TOKENS)
     tokens = tokens_compile.findall(tpl_conditions)
     return tokens
@@ -137,6 +169,7 @@ def replace_var_conditions(token_conditions, vars_data):
     :return: [10, '>', '10', 'and', 10, '<', '20']
     """
     tokens = token_conditions[:]
+    print tokens, vars_data
     for i, token in enumerate(tokens):
         if token in vars_data:
             tokens[i] = vars_data[token]
