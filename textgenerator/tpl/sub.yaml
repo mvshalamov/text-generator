@@ -8,3 +8,15 @@
 
     - conditions: "distance < 100"
       value: "<distance> метра"
+
+
+- name: "per"
+  values:
+    - conditions: "per < 50"
+      value: "<per> зайцев"
+
+    - conditions: "per > 50 and per < 1500"
+      value: "<per> зайцев"
+
+    - conditions: "per < 100"
+      value: "<per> зайцев"
