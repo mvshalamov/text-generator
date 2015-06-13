@@ -39,11 +39,3 @@ class Generator(object):
             res.append(generate_text(context))
 
         return ' '.join(res)
-
-
-if __name__ == '__main__':
-    gen = Generator('tpl/settings.yaml')
-    print gen.generate_text(
-        ['Heading', 'Main', 'Heading'],
-        {'city': u'Париж', 'distance': '10', 'name': u'Смоуг', 'type': u'Первый', 'per': u'40'}
-    )
