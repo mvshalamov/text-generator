@@ -10,7 +10,8 @@ def _take_word_form(word, form):
         n = it.inflect({form})
         if n:
             return n.word
-    print u'WARNING: unable to parse word "{}". Falling back to its original value'.format(word)
+    #TODO: log
+    #print u'WARNING: unable to parse word "{}". Falling back to its original value'.format(word)
     return word
 
 

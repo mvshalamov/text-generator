@@ -30,9 +30,6 @@ class Generator(object):
         return context
 
     def generate_text(self, list_names, tpl_vars):
-        """
-        :param list_proposal: [heading, main, heading]
-        """
         res = []
         for name_tpl in list_names:
             context = self._create_context(name_tpl, tpl_vars)

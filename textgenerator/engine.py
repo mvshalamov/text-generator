@@ -56,7 +56,8 @@ def _fabric_tplengine_functions(name_function, context):
     try:
         func = getattr(context['funcs'], name_function)
     except AttributeError:
-        print "ERROR! not template function " + str(name_function)
+        #TODO: log
+        #print "ERROR! not template function " + str(name_function)
         return None
 
     return func
