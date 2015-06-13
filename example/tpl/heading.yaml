@@ -1,0 +1,15 @@
+- name: "NAME+LOC"
+  conditions: []
+  probability: 40
+  values:
+    - conditions: "distance > 10 and distance < 20"
+      probability: 10
+      'value': '<name~inflect_case:nomn~capfirst> {разместился|расположен|находится} в [distance] от центра города <city~inflect_case:gent~capfirst>.'
+
+- name: "NAME+LOC-AI"
+  conditions: []
+  probability: 20
+  values:
+    - conditions: ""
+      probavility: 10
+      value: "Отель <name~inflect_case:nomn~capfirst> {разместился|расположен|находится} в Париже."

@@ -1,0 +1,16 @@
+setup.py
+example/__init__.py
+example/generate.py
+textgenerator/__init__.py
+textgenerator/engine.py
+textgenerator/generator.py
+textgenerator/tpl_functions.py
+textgenerator.egg-info/PKG-INFO
+textgenerator.egg-info/SOURCES.txt
+textgenerator.egg-info/dependency_links.txt
+textgenerator.egg-info/not-zip-safe
+textgenerator.egg-info/requires.txt
+textgenerator.egg-info/top_level.txt
+textgenerator/tests/__init__.py
+textgenerator/tests/test_engine.py
+textgenerator/tests/test_functions.py

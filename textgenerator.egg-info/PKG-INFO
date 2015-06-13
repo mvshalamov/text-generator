@@ -1,0 +1,14 @@
+Metadata-Version: 1.1
+Name: textgenerator
+Version: 1.0
+Summary: Genetrate text by templates.
+Home-page: UNKNOWN
+Author: Shalamov Maxim
+Author-email: mvshalamov@gmail.com
+License: BSD
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2

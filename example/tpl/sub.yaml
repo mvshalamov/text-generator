@@ -1,0 +1,7 @@
+- name: "distance"
+  values:
+    - conditions: "distance < 50"
+      value: "<distance> метрах"
+
+    - conditions: "distance > 50 and distance < 1500"
+      value: "<distance> метров"

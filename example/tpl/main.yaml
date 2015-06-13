@@ -1,0 +1,7 @@
+- name: "BODY+LOC"
+  conditions: []
+  probability: 40
+  values:
+
+    - 'conditions': ""
+      'value': '<type~inflect_case:nomn~capfirst> <name> {разместился|расположен|находится} в историческом центре города <city~inflect_case:nomn~capfirst>, в окружении самых известных памятников города'

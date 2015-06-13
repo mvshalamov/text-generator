@@ -3,6 +3,9 @@ import copy
 import re
 import random
 
+PATTERN_VAR = "<[^>\n]+>"
+PATTERN_INCLUDE = "\[[^\]\n]+\]"
+
 
 def get_sub_tpl_by_name(sub_tpl, name_tpl):
     for tpl in sub_tpl:
@@ -11,57 +14,8 @@ def get_sub_tpl_by_name(sub_tpl, name_tpl):
     raise KeyError('not sub tpl name = %s' % name_tpl)
 
 
-def change_sub_tpl(tpl, vars_sub_tpl):
-    pattern = re.compile(PATTERN_INCLUDE)
-    res = tpl
-    for r in vars_sub_tpl:
-        res = pattern.sub(r, res, 1)
-
-    return spintax(res)
-
-
-def render(context):
-    """
-    :param tpl: шаблон предложения
-    :param vars_tpl: список переменных и их значений для шаблона
-    :return: отрендеренное предложение
-    """
-    main_tpls = choice_tpl_by_probability(context['tpls'], context['tpl_vars'])
-    print '??????????', main_tpls['values']
-    tpl = choice_tpl_by_probability(main_tpls['values'], context['tpl_vars'])['value']
-    print "?????????????????????????????", tpl
-
-
-    names_sub_tpl = get_tpl_include(tpl)
-    print '>>>>>>>>>!!!!!', names_sub_tpl
-    if names_sub_tpl and context['sub_tpls']:
-        for name in names_sub_tpl:
-            l_sub_tpl = get_sub_tpl_by_name(context['sub_tpls'], name)
-            sub_tpl = choice_tpl_by_probability(l_sub_tpl['values'], context['tpl_vars'])
-            print '<<<<<<<<<<<<<<<<', sub_tpl
-            render_sub_tpl = _render(sub_tpl['value'], context)
-            tpl = change_sub_tpl(tpl, [render_sub_tpl])
-
-    print '?>>>>>>>>>>>>>>>>', tpl
-    return _render(tpl, context)
-
-
-def _render(tpl, context):
-    vars = get_tpl_variables(tpl)
-    render_vars = render_tpl_vars(vars, context['tpl_vars'], context)
-    return render_tpl(tpl, render_vars)
-
-
-PATTERN_VAR = "<[^>\n]+>"
-PATTERN_INCLUDE = "\[[^\]\n]+\]"
-
-
-def get_tpl_include(tpl):
-    """
-    :param tpl: шаблон предложения
-    :return: паттерны (пеоеменные и функции, которые к ним применяются)
-    """
-    result = re.finditer(PATTERN_INCLUDE, tpl)
+def get_text_patterns(tpl, patterns):
+    result = re.finditer(patterns, tpl)
     vars = []
     for match in result:
         vars.append(match.group()[1:-1].replace(' ', ''))
@@ -69,13 +23,36 @@ def get_tpl_include(tpl):
     return vars
 
 
-def fabric_tplengine_functions(name_function, context):
-    """
-    :param name_function:
-    :return: function
-    """
-    if name_function == 'render_sub_tpl':
-        return render_sub_tpl(context)
+def insert_value_in_tpl(tpl, vars, pattern):
+    pattern = re.compile(pattern)
+    for r in vars:
+        tpl = pattern.sub(r, tpl, 1)
+
+    return tpl
+
+
+def generate_text(context):
+    main_tpls = choice_tpl_by_probability(context['tpls'], context['tpl_vars'])
+    tpl = choice_tpl_by_probability(main_tpls['values'], context['tpl_vars'])['value']
+
+    names_sub_tpl = get_text_patterns(tpl, PATTERN_INCLUDE)
+    if names_sub_tpl and context['sub_tpls']:
+        for name in names_sub_tpl:
+            l_sub_tpl = get_sub_tpl_by_name(context['sub_tpls'], name)
+            sub_tpl = choice_tpl_by_probability(l_sub_tpl['values'], context['tpl_vars'])
+            render_sub_tpl = _render(sub_tpl['value'], context)
+            tpl = spintax(insert_value_in_tpl(tpl, [render_sub_tpl], PATTERN_INCLUDE))
+
+    return _render(tpl, context)
+
+
+def _render(tpl, context):
+    vars = get_text_patterns(tpl, PATTERN_VAR)
+    render_vars = render_tpl_vars(vars, context)
+    return spintax(insert_value_in_tpl(tpl, render_vars, PATTERN_VAR))
+
+
+def _fabric_tplengine_functions(name_function, context):
     try:
         func = getattr(context['funcs'], name_function)
     except AttributeError:
@@ -85,30 +62,14 @@ def fabric_tplengine_functions(name_function, context):
     return func
 
 
-def render_sub_tpl(context, sub_tpl):
-    """
-    добавляем подшаблоны в основнйо шаблон
-    :param context:
-    :return:
-    """
-    return render(sub_tpl, context['tpl_vars'], context)
-
-
 def _parse_funcs_and_params(funcs_data):
-    """
-    получаем строки шаблона с функциями и параметрами
-    выдаем список функций и их параметров
-    ex: city~inflect_case:gent~capfirst
-    return: variable, funcs with params
-    """
     data_var = funcs_data.split('~')
-    print '=-=-=', data_var
     funcs = []
     variable = data_var.pop(0)
     for it in data_var:
         data = it.split(':')
         func_name = data.pop(0)
-        funcs.append([(func_name, data)])
+        funcs.append((func_name, data))
 
     return variable, funcs
 
@@ -128,15 +89,10 @@ def spintax(value):
     return value
 
 
-def render_tpl_vars(vars, value_vars, context):
-    """
-    :param vars:[u'type~inflect_case:gent~lower', u'name', u'distance', u'city~inflect_case:gent~capfirst']
-    :param value_vars: значения переменных, напр.: {'type': Первый}
-    :return: значения переменных готовых к вставке в шаблон
-    """
-    print '-======', vars
+def render_tpl_vars(vars, context):
     res = vars[:]
-    for i, tpl_var in enumerate(vars[:]):
+    value_vars = context['tpl_vars']
+    for i, tpl_var in enumerate(vars):
         var, funcs = _parse_funcs_and_params(tpl_var)
 
         if var in value_vars:
@@ -146,57 +102,16 @@ def render_tpl_vars(vars, value_vars, context):
     return res
 
 
-def get_tpl_variables(tpl):
-    """
-    :param tpl: шаблон предложения
-    :return: паттерны (пеоеменные и функции, которые к ним применяются)
-    """
-    result = re.finditer(PATTERN_VAR, tpl)
-    vars = []
-    for match in result:
-        vars.append(match.group()[1:-1].replace(' ', ''))
-
-    return vars
-
-
-def render_tpl(proposal, render_vars):
-    """
-    :param proposal: предложение в которое нужно подставить полученные значения
-    :param render_vars: переменные которые нужно подставить
-    :return: готовое предложение
-    """
-    pattern = re.compile(PATTERN_VAR)
-    res = proposal
-    for r in render_vars:
-        res = pattern.sub(r, res, 1)
-
-    return spintax(res)
-
-
 def _render_variables_with_funcs(var_value, functions, context):
-    """
-    :param var_value: значение переменной шаблона
-    :param functions: функции пременяемые к переменной и их параметры
-    :return: значение переменной после применения к ним функций
-    """
+    if isinstance(var_value, str):
+        var_value = var_value.decode('utf-8')
     value = var_value
     for func in functions:
-        tpl_func = fabric_tplengine_functions(func[0][0], context)
+        tpl_func = _fabric_tplengine_functions(func[0], context)
         if tpl_func:
-            value = tpl_func(value, *func[0][1])
+            value = tpl_func(value, *func[1])
 
     return value
-
-
-def get_sub_tpl(tpl, name_tpl):
-    for it in tpl:
-        if it['name'] == name_tpl:
-            return copy.deepcopy(it)
-
-
-import re
-import random
-import copy
 
 
 def choice_tpl_by_probability(list_tpl, vars_tpl):
@@ -205,11 +120,11 @@ def choice_tpl_by_probability(list_tpl, vars_tpl):
     :param vars_tpl: словарь переменных шаблона
     :return: выбранный по вероятности шаблон
     """
-    group = group_tpl_by_id(list_tpl, vars_tpl)
-    return choice_from_group_probability(group, random.randint(1, group[1]))
+    group = _group_tpl_by_id(list_tpl, vars_tpl)
+    return _choice_from_group_probability(group, random.randint(1, group[1]))
 
 
-def group_tpl_by_id(list_tpl, vars_tpl):
+def _group_tpl_by_id(list_tpl, vars_tpl):
     """
     :param list_tpl: [{'probability': int, ....},{'probability': int}]
     :param vars_tpl: словарь переменных шаблона
@@ -217,7 +132,6 @@ def group_tpl_by_id(list_tpl, vars_tpl):
     при вероятностях 10, 15 - получим [(0, 10, item) (10, 25, item)]
     второй параметр, суммарное кол-во вероятностей
     """
-    print '-=-=-=', list_tpl
     probability_list = []
     max_num_probability = 0
     for item in list_tpl:
@@ -229,7 +143,7 @@ def group_tpl_by_id(list_tpl, vars_tpl):
     return probability_list, max_num_probability
 
 
-def choice_from_group_probability(group_probability, num_probability):
+def _choice_from_group_probability(group_probability, num_probability):
     """
     :param group_probability: результат group_tpl_by_id
     :param num_probability: выпавшая вероятность от 1 до результат group_tpl_by_id[1]
@@ -240,7 +154,6 @@ def choice_from_group_probability(group_probability, num_probability):
     if max_num_probability:
         for start_prob, end_prob, item in probability_list:
             if start_prob < num_probability <= end_prob:
-                print num_probability, num_probability, item
                 return item
 
 
@@ -262,7 +175,6 @@ def replace_var_conditions(token_conditions, vars_data):
     :return: [10, '>', '10', 'and', 10, '<', '20']
     """
     tokens = token_conditions[:]
-    print tokens, vars_data
     for i, token in enumerate(tokens):
         if token in vars_data:
             tokens[i] = vars_data[token]
