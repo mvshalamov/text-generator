@@ -15,7 +15,7 @@ Textgenerator предназначен для создания уникальн�
 
 ##Установка
 
-'python setup.py install'
+`python setup.py install`
 
 
 ##Пример
