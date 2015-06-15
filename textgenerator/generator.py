@@ -36,3 +36,8 @@ class Generator(object):
             res.append(generate_text(context))
 
         return ' '.join(res)
+
+    def igenerate_text(self, list_names, tpl_vars):
+        for name_tpl in list_names:
+            context = self._create_context(name_tpl, tpl_vars)
+            yield generate_text(context)

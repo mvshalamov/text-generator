@@ -3,5 +3,8 @@
   probability: 40
   values:
 
-    - 'conditions': ""
-      'value': '<type~inflect_case:nomn~capfirst> <name> {разместился|расположен|находится} в историческом центре города <city~inflect_case:nomn~capfirst>, в окружении самых известных памятников города'
+    - conditions: ""
+      value: '<type~inflect_case:nomn~capfirst> <name> {разместился|расположен|находится} в {историческом центре|самом сердце} <city~inflect_case:gent~capfirst>, в окружении самых известных памятников города.'
+
+    - conditions: ""
+      value: '<type~inflect_case:nomn~capfirst> <name> {разместился|расположен|находится} в окружении прекрасных памятников города, в самом {сердце|центре} <city~inflect_case:gent~capfirst>.'

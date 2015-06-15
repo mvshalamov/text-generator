@@ -4,7 +4,7 @@
   values:
     - conditions: "distance > 10 and distance < 20"
       probability: 10
-      'value': '<name~inflect_case:nomn~capfirst> {разместился|расположен|находится} в [distance] от центра города <city~inflect_case:gent~capfirst>.'
+      'value': '<name~inflect_case:nomn~capfirst> {разместился|расположен|находится} в [distance] от центра <city~inflect_case:gent~capfirst>.'
 
 - name: "NAME+LOC-AI"
   conditions: []
@@ -12,4 +12,4 @@
   values:
     - conditions: ""
       probavility: 10
-      value: "Отель <name~inflect_case:nomn~capfirst> {разместился|расположен|находится} в Париже."
+      value: "Отель <name~inflect_case:nomn~capfirst> {разместился|расположен|находится} в <city~inflect_case:loct~capfirst>."
