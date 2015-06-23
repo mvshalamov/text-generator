@@ -1,2 +1,0 @@
-pymorphy2==0.8
-PyYAML==3.11

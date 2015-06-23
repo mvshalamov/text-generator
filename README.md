@@ -1,28 +1,30 @@
-#textgenerator
+# Text Generator
 
-##Обзор
+## Overview
 
-Textgenerator предназначен для создания уникальный человекочитаемых предложений по шаблонам. С использованием функций морфологии для русского языка.
+Textgenerator (TG) is refers to generating unique "literature" and human readable text from templates and data.
 
-
-##Зависимости
-
-- Python 2.7
-- pymorphy2==0.8
-- pymorphy2-dicts==2.4.393442.3710985
-- PyYAML==3.11
+TG uses morphological tools to get the right form of words with declension to context.
 
 
-##Установка
+## Requirements
+
+- [Python](https://www.python.org)
+- [pymorphy2](https://pymorphy2.readthedocs.org/)
+- [PyYAML](http://pyyaml.org)
+
+
+## Installing
 
 `python setup.py install`
 
 
-##Пример
+## Example
 
-Находится в папке [example](/example "example")
+In the subdirectory [example](/example "example")
 
-##Планы
+## ToDo
 
-1. Добавление больше функций для морфологии.
-2. Добавление работы с английским языком.
+[ ] Добавление больше функций для морфологии.
+[ ] Добавление работы с английским языком.
+

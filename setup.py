@@ -9,7 +9,7 @@ setup(
     description='Genetrate text by templates.',
     author='Shalamov Maxim',
     author_email='mvshalamov@gmail.com',
-    company='Rambler&co',
+    company='Rambler&Co',
     install_requires=['pymorphy2==0.8', 'PyYAML==3.11'],
     long_description=open(join(dirname(__file__), 'README.md')).read(),
     packages=find_packages(),
