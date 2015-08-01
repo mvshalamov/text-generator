@@ -3,8 +3,9 @@ import copy
 import re
 import random
 
-PATTERN_VAR = "<[^>\n]+>"
-PATTERN_INCLUDE = "\[[^\]\n]+\]"
+PATTERN_VAR = r"<[^>\n]+>"
+PATTERN_INCLUDE = r"\[[^\]\n]+\]"
+PATTERN_FOR_TOKENS = r'>|>=|<|<=|==|or|and|[\w\d]+'
 
 
 def get_sub_tpl_by_name(sub_tpl, name_tpl):
@@ -16,17 +17,17 @@ def get_sub_tpl_by_name(sub_tpl, name_tpl):
 
 def get_text_patterns(tpl, patterns):
     result = re.finditer(patterns, tpl)
-    vars = []
+    variables = []
     for match in result:
-        vars.append(match.group()[1:-1].replace(' ', ''))
+        variables.append(match.group()[1:-1].replace(' ', ''))
 
-    return vars
+    return variables
 
 
-def insert_value_in_tpl(tpl, vars, pattern):
+def insert_value_in_tpl(tpl, variables, pattern):
     pattern = re.compile(pattern)
-    for r in vars:
-        tpl = pattern.sub(r, tpl, 1)
+    for variable in variables:
+        tpl = pattern.sub(variable, tpl, 1)
 
     return tpl
 
@@ -47,8 +48,8 @@ def generate_text(context):
 
 
 def _render(tpl, context):
-    vars = get_text_patterns(tpl, PATTERN_VAR)
-    render_vars = render_tpl_vars(vars, context)
+    variables = get_text_patterns(tpl, PATTERN_VAR)
+    render_vars = render_tpl_vars(variables, context)
     return spintax(insert_value_in_tpl(tpl, render_vars, PATTERN_VAR))
 
 
@@ -56,8 +57,6 @@ def _fabric_tplengine_functions(name_function, context):
     try:
         func = getattr(context['funcs'], name_function)
     except AttributeError:
-        #TODO: log
-        #print "ERROR! not template function " + str(name_function)
         return None
 
     return func
@@ -67,8 +66,8 @@ def _parse_funcs_and_params(funcs_data):
     data_var = funcs_data.split('~')
     funcs = []
     variable = data_var.pop(0)
-    for it in data_var:
-        data = it.split(':')
+    for item in data_var:
+        data = item.split(':')
         func_name = data.pop(0)
         funcs.append((func_name, data))
 
@@ -80,20 +79,20 @@ def spintax(value):
         value = value.decode('utf8')
     delimiter = '|'
     while True:
-        value, n = re.subn(
+        value, count_values = re.subn(
             '{([^{}]*)}',
             lambda m: random.choice(m.group(1).split(delimiter)),
             value
         )
-        if n == 0:
+        if count_values == 0:
             break
     return value
 
 
-def render_tpl_vars(vars, context):
-    res = vars[:]
+def render_tpl_vars(variables, context):
+    res = variables[:]
     value_vars = context['tpl_vars']
-    for i, tpl_var in enumerate(vars):
+    for i, tpl_var in enumerate(variables):
         var, funcs = _parse_funcs_and_params(tpl_var)
 
         if var in value_vars:
@@ -124,7 +123,9 @@ def _group_tpl_by_id(list_tpl, vars_tpl):
     probability_list = []
     max_num_probability = 0
     for item in list_tpl:
-        if not item.get('conditions', False) or validate_conditions(item.get('conditions'), vars_tpl):
+        if not item.get('conditions', False) or validate_conditions(
+                item.get('conditions'), vars_tpl
+        ):
             probability = item.get('probability', 1)
             probability_list.append((max_num_probability, max_num_probability + probability, item))
             max_num_probability += probability
@@ -141,7 +142,6 @@ def _choice_from_group_probability(group_probability, num_probability):
 
 
 def parse_conditions(tpl_conditions):
-    PATTERN_FOR_TOKENS = '>|>=|<|<=|==|or|and|[\w\d]+'
     tokens_compile = re.compile(PATTERN_FOR_TOKENS)
     tokens = tokens_compile.findall(tpl_conditions)
     return tokens

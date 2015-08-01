@@ -7,3 +7,4 @@ if __name__ == '__main__':
         ['Heading', 'Main', 'Heading'],
         {'city': u'Париж', 'distance': '11', 'name': u'Грант', 'type': u'Первый'}
     )
+

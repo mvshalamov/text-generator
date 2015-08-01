@@ -6,7 +6,7 @@ import textgenerator.tpl_functions as funcs
 
 
 class Generator(object):
-    def __init__(self, settings_file, tpl_funcs=funcs):
+    def __init__(self, settings_file):
         self.funcs = funcs
         settings = self.load_yaml(settings_file)
 
@@ -14,7 +14,8 @@ class Generator(object):
         for name, path in settings.items():
             self.templates[name] = self.load_yaml(path)
 
-    def load_yaml(self, path_to_tpl):
+    @staticmethod
+    def load_yaml(path_to_tpl):
         with open(path_to_tpl, 'r') as tpl:
             data = tpl.read()
 

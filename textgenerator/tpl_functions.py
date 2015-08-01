@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import pymorphy2
 
-morph = pymorphy2.MorphAnalyzer()
+MORPHY = pymorphy2.MorphAnalyzer()
 
 
 def _take_word_form(word, form):
 
-    for it in morph.parse(word):
-        n = it.inflect({form})
-        if n:
-            return n.word
-    #TODO: log
-    #print u'WARNING: unable to parse word "{}". Falling back to its original value'.format(word)
+    for item in MORPHY.parse(word):
+        word_form = item.inflect({form})
+        if word_form:
+            return word_form.word
+
     return word
 
 
@@ -26,5 +25,3 @@ def lower(value):
 
 def capfirst(value):
     return value.title()
-
-
