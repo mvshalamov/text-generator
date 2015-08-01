@@ -25,6 +25,6 @@ In the subdirectory [example](/example "example")
 
 ## ToDo
 
-- [ ] Добавление больше функций для морфологии.
-- [ ] Добавление работы с английским языком.
+- [ ] Add more features for work with morphology.
+- [ ] Add functions for work with english.
 
